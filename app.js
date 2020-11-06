@@ -3,6 +3,7 @@ require('dotenv').config();
 
 // require modules
 const Discord = require('discord.js');
+const affiliate = require('./affiliate.js');
 const db = require('diskdb');
 
 // initalize client
@@ -150,8 +151,7 @@ client.on('message', (message) => {
 								new Discord.MessageEmbed()
 									.setColor('#FD9901')
 									.setTitle('Affiliate Link Created!')
-									.setDescription('Your affiliate link was created successfully!')
-									.addField('Link', res)
+									.setDescription('Your affiliate link was created successfully!\n' + res)
 									.setTimestamp()
 									.setFooter('Amazon Affiliates', 'https://i.imgur.com/h1SU6XO.png')
 							);
