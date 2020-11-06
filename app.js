@@ -1,10 +1,15 @@
 // setup env variables
 require('dotenv').config();
+
 // require modules
 const Discord = require('discord.js');
+const db = require('diskdb');
 
 // initalize client
 const client = new Discord.Client();
+
+// connect to json database
+db.connect('./', [ 'codes' ]);
 
 // connect to discord
 client.on('ready', () => {
