@@ -9,7 +9,7 @@ const db = require('diskdb');
 const client = new Discord.Client();
 
 // connect to json database
-db.connect('./', [ 'codes' ]);
+db.connect('./', [ 'tags' ]);
 
 // connect to discord
 client.on('ready', () => {
@@ -43,38 +43,38 @@ client.on('message', (message) => {
 					.setThumbnail('https://i.imgur.com/h1SU6XO.png')
 					.addField(
 						'Bot Commands',
-						'`a!set <code>` - Set your affiliate code to be used.\n`a!remove` - Remove your affiliate code.\n`a!code` - View your currently set affiliate code.\n`a!create <link>` - Create an affiliate link for a product.'
+						'`a!set <tag>` - Set your affiliate tag to be used.\n`a!remove` - Remove your affiliate tag.\n`a!tag` - View your currently set affiliate tag.\n`a!create <link>` - Create an affiliate link for a product.'
 					)
 					.setTimestamp()
 					.setFooter('Amazon Affiliates', 'https://i.imgur.com/h1SU6XO.png')
 			);
 		} else if (message.content.split(' ')[0] === 'set') {
-			// extract code from command
-			let code = message.content.split(' ')[1];
+			// extract tag from command
+			let tag = message.content.split(' ')[1];
 
-			// make sure code exists
-			if (code) {
-				// check if user already has code set
-				if (db.codes.findOne({ user: message.author.id })) {
-					// prompt to first remove code
+			// make sure tag exists
+			if (tag) {
+				// check if user already has tag set
+				if (db.tags.findOne({ user: message.author.id })) {
+					// prompt to first remove tag
 					message.channel.send(
 						createErr(
-							'You already have an affiliate code set.\nTo add a new one, please first remove it using `a!remove`',
+							'You already have an affiliate tag set.\nTo add a new one, please first remove it using `a!remove`',
 							message.member.user.tag,
 							message.member.user.avatarURL()
 						)
 					);
 				} else {
-					// save code to db
-					db.codes.save({
-						code,
+					// save tag to db
+					db.tags.save({
+						tag,
 						user: message.author.id
 					});
 
 					// display success
 					message.channel.send(
 						createMessage(
-							'Your affiliate code is now set to `' + code + '`',
+							'Your affiliate tag is now set to `' + tag + '`',
 							message.member.user.tag,
 							message.member.user.avatarURL()
 						)
@@ -83,55 +83,103 @@ client.on('message', (message) => {
 			} else {
 				// display invalid
 				message.channel.send(
-					createErr('Invalid code provided.', message.member.user.tag, message.member.user.avatarURL())
+					createErr('Invalid tag provided.', message.member.user.tag, message.member.user.avatarURL())
 				);
 			}
 		} else if (message.content === 'remove') {
-			// check if user has affiliate code set
-			if (db.codes.findOne({ user: message.author.id })) {
-				// remove code from db
-				db.codes.remove({ user: message.author.id });
+			// check if user has affiliate tag set
+			if (db.tags.findOne({ user: message.author.id })) {
+				// remove tag from db
+				db.tags.remove({ user: message.author.id });
 
 				// display success
 				message.channel.send(
 					createMessage(
-						'Your affiliate code was removed successfully!',
+						'Your affiliate tag was removed successfully!',
 						message.member.user.tag,
 						message.member.user.avatarURL()
 					)
 				);
 			} else {
-				// prompt to first set code
+				// prompt to first set tag
 				message.channel.send(
 					createErr(
-						'No affiliate code currently set.\nSet one using `a!set <code>`',
+						'No affiliate tag currently set.\nSet one using `a!set <tag>`',
 						message.member.user.tag,
 						message.member.user.avatarURL()
 					)
 				);
 			}
-		} else if (message.content === 'code') {
-			// retrieve code from db
-			let code = db.codes.findOne({ user: message.author.id });
+		} else if (message.content === 'tag') {
+			// retrieve tag from db
+			let tag = db.tags.findOne({ user: message.author.id });
 
-			// check if user has code set
-			if (code) {
-				// display code
+			// check if user has tag set
+			if (tag) {
+				// display tag
 				message.channel.send(
 					createMessage(
-						'Your affiliate code is currently set to `' + code.code + '`',
+						'Your affiliate tag is currently set to `' + tag.tag + '`',
 						message.member.user.tag,
 						message.member.user.avatarURL()
 					)
 				);
 			} else {
-				// prompt to first set code
+				// prompt to first set tag
 				message.channel.send(
 					createErr(
-						'No affiliate code currently set.\nSet one using `a!set <code>`',
+						'No affiliate tag currently set.\nSet one using `a!set <tag>`',
 						message.member.user.tag,
 						message.member.user.avatarURL()
 					)
+				);
+			}
+		} else if (message.content.split(' ')[0] === 'create') {
+			let link = message.content.split(' ')[1];
+			let tag = db.tags.findOne({ user: message.author.id });
+
+			// make sure link exists
+			if (link) {
+				// make sure link is a valid url
+				if (link.slice(0, 8) === 'https://' || link.slice(0, 7) === 'http://') {
+					// make sure user has tag set
+					if (tag) {
+						affiliate.create(link, tag.tag).then((res) => {
+							// display created link embed
+							message.channel.send(
+								new Discord.MessageEmbed()
+									.setColor('#FD9901')
+									.setTitle('Affiliate Link Created!')
+									.setDescription('Your affiliate link was created successfully!')
+									.addField('Link', res)
+									.setTimestamp()
+									.setFooter('Amazon Affiliates', 'https://i.imgur.com/h1SU6XO.png')
+							);
+						});
+					} else {
+						// prompt to first set tag
+						message.channel.send(
+							createErr(
+								'No affiliate tag currently set.\nSet one using `a!set <tag>`',
+								message.member.user.tag,
+								message.member.user.avatarURL()
+							)
+						);
+					}
+				} else {
+					// display invalid
+					message.channel.send(
+						createErr(
+							'Invalid amazon link provided.',
+							message.member.user.tag,
+							message.member.user.avatarURL()
+						)
+					);
+				}
+			} else {
+				// display invalid
+				message.channel.send(
+					createErr('Invalid amazon link provided.', message.member.user.tag, message.member.user.avatarURL())
 				);
 			}
 		}

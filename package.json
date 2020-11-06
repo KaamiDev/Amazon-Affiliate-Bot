@@ -12,6 +12,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"axios": "^0.21.0",
+		"deshortify": "^1.0.4",
 		"discord.js": "^12.4.1",
 		"diskdb": "^0.1.17",
 		"dotenv": "^8.2.0"
