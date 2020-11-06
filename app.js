@@ -38,7 +38,7 @@ client.on('message', (message) => {
 			message.channel.send(
 				new Discord.MessageEmbed()
 					.setColor('#FD9901')
-					.setTitle('Amazon Affiliates')
+					.setTitle('Amazon Affiliate Bot')
 					.setDescription('Create quick amazon affiliate links!')
 					.setThumbnail('https://i.imgur.com/h1SU6XO.png')
 					.addField(
@@ -46,7 +46,7 @@ client.on('message', (message) => {
 						'`a!set <code>` - Set your affiliate code to be used.\n`a!remove` - Remove your affiliate code.\n`a!code` - View your currently set affiliate code.\n`a!create <link>` - Create an affiliate link for a product.'
 					)
 					.setTimestamp()
-					.setFooter('Amazon Affiliates', 'https://i.imgur.com/h1SU6XO.png')
+					.setFooter('Amazon Affiliate Bot', 'https://i.imgur.com/h1SU6XO.png')
 			);
 		} else if (message.content.split(' ')[0] === 'set') {
 			// extract code from command
