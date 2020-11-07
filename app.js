@@ -155,6 +155,8 @@ client.on('message', (message) => {
 									.setTimestamp()
 									.setFooter('Amazon Affiliates', 'https://i.imgur.com/h1SU6XO.png')
 							);
+							// send seperately as well
+							message.channel.send(res);
 						});
 					} else {
 						// prompt to first set tag
